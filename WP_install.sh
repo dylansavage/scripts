@@ -7,6 +7,10 @@ Usage: $0 "Site Name"
 EOF
 }
 
+#  Check for the user using this script
+
+sudoUser=`who am i | awk '{print $1}'`
+
 #  Enter varibles needed for mysql config
 read -s -p "Enter your mysql root password:"$'\n' dbRootPass
 read -p "Enter the new database name:" dbName
@@ -152,10 +156,10 @@ _EOF_
 
 /bin/systemctl restart httpd.service
 
-/bin/wget http://wordpress.org/latest.tar.gz /home/"$SUDO_USER"/
-/bin/tar xzvf /home/"$SUDO_USER"/latest.tar.gz
+/bin/wget http://wordpress.org/latest.tar.gz /home/"$sudoUser"/
+/bin/tar xzvf /home/"$sudoUser"/latest.tar.gz
 
-/bin/rsync -avP /home/"$SUDO_USER"/wordpress/ /var/www/html/"$siteName"
+/bin/rsync -avP /home/"$sudoUser"/wordpress/ /var/www/html/"$siteName"
 /bin/chown -R apache:apache /var/www/html/"$siteName"
 /bin/cp /var/www/html/"$siteName"/wp-config-sample.php /var/www/html/"$siteName"/wp-config.php
 
@@ -165,8 +169,8 @@ _EOF_
 sed -i "s:database_name_here:${dbName}:; s:username_here:${userName}:; s:password_here:${userPass}:" /var/www/html/"$siteName"/wp-config.php
 sed -i '151s/None/All/' /etc/httpd/conf/httpd.conf
 
-/bin/rm -f /home/"$SUDO_USER"/latest.tar.gz 
-/bin/rm -r -f /home/"$SUDO_USER"/wordpress
+/bin/rm -f /home/"$sudoUser"/latest.tar.gz 
+/bin/rm -r -f /home/"$sudoUser"/wordpress
 
 #  Set Selinux permissions and restorecon
 
